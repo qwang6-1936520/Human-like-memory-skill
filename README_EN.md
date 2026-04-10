@@ -37,7 +37,7 @@ Default endpoint: `https://plugin.human-like.me`
 After publish, install from GitHub-backed hub:
 
 ```bash
-hermes skills install github:qwang6-1936520/humanlike-memory-skill
+hermes skills install github:qwang6-1936520/Human-like-memory-skill
 ```
 
 For local testing:
@@ -91,7 +91,7 @@ echo '[{"role":"user","content":"Hi"},{"role":"assistant","content":"Hello"}]' |
 ## Publish to Hermes Community Hub
 
 ```bash
-hermes skills publish . --to github --repo qwang6-1936520/humanlike-memory-skill
+hermes skills publish . --to github --repo qwang6-1936520/Human-like-memory-skill
 ```
 
 ## Official Optional-Skills Readiness

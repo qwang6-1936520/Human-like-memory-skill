@@ -73,4 +73,4 @@ The CLI reads only these environment variables:
 
 ## Source
 
-- GitHub: <https://github.com/qwang6-1936520/humanlike-memory-skill>
+- GitHub: <https://github.com/qwang6-1936520/Human-like-memory-skill>
