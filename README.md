@@ -60,41 +60,58 @@ Human-Like Memory adds explicit long-term memory operations to your agent stack:
 
 ### OpenClaw
 
-Start from:
-
-```text
-https://plugin.human-like.me/docs?tab=plugin
-```
-
-### Hermes Agent
-
-Install from GitHub:
-
-```bash
-hermes skills install github:qwang6-1936520/Human-like-memory-skill
-```
-
-Then configure:
+Quick start:
 
 ```bash
 export HUMAN_LIKE_MEM_API_KEY="mp_your_key_here"
 export HUMAN_LIKE_MEM_BASE_URL="https://plugin.human-like.me"
-export HUMAN_LIKE_MEM_USER_ID="hermes-user"
+export HUMAN_LIKE_MEM_USER_ID="openclaw-user"
 export HUMAN_LIKE_MEM_AGENT_ID="main"
 ```
 
+Official docs:
+<https://plugin.human-like.me/docs?tab=plugin>
+
+### Hermes Agent
+
+Quick start:
+
+```bash
+hermes skills install github:qwang6-1936520/Human-like-memory-skill
+export HUMAN_LIKE_MEM_API_KEY="mp_your_key_here"
+export HUMAN_LIKE_MEM_BASE_URL="https://plugin.human-like.me"
+export HUMAN_LIKE_MEM_USER_ID="hermes-user"
+export HUMAN_LIKE_MEM_AGENT_ID="main"
+node ./scripts/memory.mjs config
+```
+
+Official docs:
+<https://plugin.human-like.me/docs?tab=hermes>
+
 ### API
 
-Base URL:
+Quick start:
 
-```text
-https://plugin.human-like.me
+```bash
+curl -X POST "https://plugin.human-like.me/api/plugin/v1/search/memory" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: mp_your_key_here" \
+  -d '{
+    "query": "what projects am I working on",
+    "user_id": "demo-user",
+    "agent_id": "main",
+    "memory_limit_number": 6,
+    "min_score": 0.1
+  }'
 ```
 
 Core endpoints used by this repository:
 
 - `POST /api/plugin/v1/search/memory`
 - `POST /api/plugin/v1/add/message`
+
+Official docs:
+<https://plugin.human-like.me/docs?tab=api>
 
 ## Which Integration Should You Choose?
 
