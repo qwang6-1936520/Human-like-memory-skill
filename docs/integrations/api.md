@@ -9,7 +9,7 @@ Official documentation:
 ## Base URL
 
 ```text
-https://plugin.human-like.me
+http://humanlike-external.coolfriend.cn
 ```
 
 ## Endpoints Used In This Repository
@@ -36,14 +36,13 @@ The Hermes runtime in this repo also sends:
 ## Search Example
 
 ```bash
-curl -X POST "https://plugin.human-like.me/api/plugin/v1/search/memory" \
+curl -X POST "http://humanlike-external.coolfriend.cn/api/plugin/v1/search/memory" \
   -H "Content-Type: application/json" \
-  -H "x-api-key: mp_your_key_here" \
+  -H "x-api-key: YOUR_API_KEY" \
   -d '{
-    "query": "what projects am I working on",
-    "user_id": "demo-user",
-    "agent_id": "main",
-    "memory_limit_number": 6,
+    "query": "What does the user prefer?",
+    "user_id": "user_001",
+    "memory_limit_number": 5,
     "min_score": 0.1
   }'
 ```
@@ -51,28 +50,27 @@ curl -X POST "https://plugin.human-like.me/api/plugin/v1/search/memory" \
 ## Save Example
 
 ```bash
-curl -X POST "https://plugin.human-like.me/api/plugin/v1/add/message" \
+curl -X POST "http://humanlike-external.coolfriend.cn/api/plugin/v1/add/message" \
   -H "Content-Type: application/json" \
-  -H "x-api-key: mp_your_key_here" \
+  -H "x-api-key: YOUR_API_KEY" \
   -d '{
-    "user_id": "demo-user",
-    "conversation_id": "session-123",
-    "agent_id": "main",
+    "conversation_id": "conv_001",
+    "user_id": "user_001",
     "messages": [
-      { "role": "user", "content": "I prefer UTC+8 timestamps" },
-      { "role": "assistant", "content": "Understood." }
+      { "role": "user", "content": "I prefer dark mode for all interfaces" },
+      { "role": "assistant", "content": "Got it, I will remember your dark mode preference!" }
     ],
-    "tags": ["humanlike-memory-skill"],
+    "tags": ["preference"],
     "async_mode": true
   }'
 ```
 
 ## Data Model Notes
 
-Based on the runtime implementation in this repository:
+Based on the official API docs and the runtime implementation in this repository:
 
-- search requests send `query`, `user_id`, `agent_id`, `memory_limit_number`, and `min_score`
-- save requests send `user_id`, `conversation_id`, `agent_id`, and message arrays
+- search requests send `query`, optional `user_id`, optional `tags`, optional `source`, `memory_limit_number`, and `min_score`
+- save requests send `messages`, optional `user_id`, optional `conversation_id`, optional `tags`, and `async_mode`
 - the runtime also attaches metadata for session grouping
 
 ## Source References

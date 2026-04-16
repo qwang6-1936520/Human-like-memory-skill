@@ -1,91 +1,72 @@
 # Hermes Agent Integration
 
-This repository includes a Hermes skill for Human-Like Memory.
+The recommended Hermes integration is a native memory provider, not a skill.
 
 Official documentation:
 
 - <https://plugin.human-like.me/docs?tab=hermes>
 
-## What You Get
+## Quick Start
 
-- explicit `recall`
-- explicit `search`
-- explicit `save`
-- explicit `save-batch`
-- a portable Node.js runtime at `scripts/memory.mjs`
-
-## Install
-
-Install from GitHub:
+Install the provider:
 
 ```bash
-hermes skills install github:qwang6-1936520/Human-like-memory-skill
+curl -fsSL https://cdn.jsdelivr.net/npm/@humanlikememory/human-like-mem-hermes-plugin@latest/install.sh | bash
 ```
 
-For local development:
+Configure the API key:
 
 ```bash
-hermes skills install .
+echo 'HUMAN_LIKE_MEM_API_KEY=mp_xxxxxx' >> ~/.hermes/.env
 ```
 
-## Required Configuration
+Optional runtime settings:
 
 ```bash
-export HUMAN_LIKE_MEM_API_KEY="mp_your_key_here"
-export HUMAN_LIKE_MEM_BASE_URL="https://plugin.human-like.me"
-export HUMAN_LIKE_MEM_USER_ID="hermes-user"
-export HUMAN_LIKE_MEM_AGENT_ID="main"
-```
+cat <<'EOF' >> ~/.hermes/.env
+HUMAN_LIKE_MEM_BASE_URL=https://plugin.human-like.me
+HUMAN_LIKE_MEM_USER_ID=hermes-user
+HUMAN_LIKE_MEM_AGENT_ID=main
+HUMAN_LIKE_MEM_SCENARIO=openclaw-plugin
+HUMAN_LIKE_MEM_LIMIT_NUMBER=6
+HUMAN_LIKE_MEM_MIN_SCORE=0.1
+EOF
 
-Optional tuning:
-
-```bash
-export HUMAN_LIKE_MEM_LIMIT_NUMBER="6"
-export HUMAN_LIKE_MEM_MIN_SCORE="0.1"
-export HUMAN_LIKE_MEM_TIMEOUT_MS="30000"
-export HUMAN_LIKE_MEM_RECALL_ENABLED="true"
-export HUMAN_LIKE_MEM_ADD_ENABLED="true"
-export HUMAN_LIKE_MEM_AUTO_SAVE_ENABLED="true"
-export HUMAN_LIKE_MEM_SAVE_TRIGGER_TURNS="5"
-export HUMAN_LIKE_MEM_SAVE_MAX_MESSAGES="20"
+hermes gateway restart
 ```
 
 ## Verify
 
 ```bash
-node ./scripts/memory.mjs config
+rg -n "provider: humanlike" ~/.hermes/config.yaml
+ls -l ~/.hermes/hermes-agent/plugins/memory/humanlike
+hermes gateway restart
+rg -n "Memory provider 'humanlike' registered|agent_id=|scenario=" ~/.hermes/logs/agent.log | tail -n 20
 ```
 
-## Commands
+## Shared Memory Notes
 
-Recall memory:
+- If you want Hermes and another client to share the same memory pool, both `HUMAN_LIKE_MEM_AGENT_ID` and `HUMAN_LIKE_MEM_SCENARIO` must match exactly.
+- The current recommended defaults are `agent_id=main` and `scenario=openclaw-plugin`.
 
-```bash
-node ./scripts/memory.mjs recall "what projects am I working on"
-```
+## Defaults
 
-Search memory:
+- `HUMAN_LIKE_MEM_BASE_URL=https://plugin.human-like.me`
+- `HUMAN_LIKE_MEM_USER_ID=hermes-user`
+- `HUMAN_LIKE_MEM_AGENT_ID=main`
+- `HUMAN_LIKE_MEM_SCENARIO=openclaw-plugin`
+- `HUMAN_LIKE_MEM_RECALL_ENABLED=true`
+- `HUMAN_LIKE_MEM_ADD_ENABLED=true`
+- `HUMAN_LIKE_MEM_RECALL_GLOBAL=true`
+- `HUMAN_LIKE_MEM_LIMIT_NUMBER=6`
+- `HUMAN_LIKE_MEM_MIN_SCORE=0.1`
+- `HUMAN_LIKE_MEM_MIN_TURNS=5`
+- `HUMAN_LIKE_MEM_SESSION_TIMEOUT=300000`
+- `HUMAN_LIKE_MEM_TIMEOUT_MS=5000`
 
-```bash
-node ./scripts/memory.mjs search "naming preference"
-```
+## Source Notes
 
-Save a single turn:
-
-```bash
-node ./scripts/memory.mjs save "I prefer UTC+8 timestamps" "Understood"
-```
-
-Save a batch:
-
-```bash
-node ./scripts/memory.mjs save-batch < ./examples/messages.json
-```
-
-## Implementation Notes
-
-- manifest: [SKILL.md](../../SKILL.md)
-- runtime: [scripts/memory.mjs](../../scripts/memory.mjs)
+- provider source/debug entry point in this repo: [scripts/memory.mjs](../../scripts/memory.mjs)
 - security notes: [SECURITY.md](../../SECURITY.md)
 
-Use the official Hermes docs for product-side setup details and any newly added installation flows.
+For actual Hermes runtime behavior, prefer `~/.hermes/.env`, `~/.hermes/config.yaml`, and `~/.hermes/logs/agent.log` over local repo paths.

@@ -63,10 +63,10 @@ Human-Like Memory adds explicit long-term memory operations to your agent stack:
 Quick start:
 
 ```bash
-export HUMAN_LIKE_MEM_API_KEY="mp_your_key_here"
-export HUMAN_LIKE_MEM_BASE_URL="https://plugin.human-like.me"
-export HUMAN_LIKE_MEM_USER_ID="openclaw-user"
-export HUMAN_LIKE_MEM_AGENT_ID="main"
+openclaw plugin install human-like-mem
+openclaw config set plugins.entries.human-like-mem.config.apiKey "mp_your_key_here"
+openclaw config set plugins.slots.memory human-like-mem
+openclaw plugin status human-like-mem
 ```
 
 Official docs:
@@ -77,12 +77,18 @@ Official docs:
 Quick start:
 
 ```bash
-hermes skills install github:qwang6-1936520/Human-like-memory-skill
-export HUMAN_LIKE_MEM_API_KEY="mp_your_key_here"
-export HUMAN_LIKE_MEM_BASE_URL="https://plugin.human-like.me"
-export HUMAN_LIKE_MEM_USER_ID="hermes-user"
-export HUMAN_LIKE_MEM_AGENT_ID="main"
-node ./scripts/memory.mjs config
+curl -fsSL https://cdn.jsdelivr.net/npm/@humanlikememory/human-like-mem-hermes-plugin@latest/install.sh | bash
+echo 'HUMAN_LIKE_MEM_API_KEY=mp_xxxxxx' >> ~/.hermes/.env
+cat <<'EOF' >> ~/.hermes/.env
+HUMAN_LIKE_MEM_BASE_URL=https://plugin.human-like.me
+HUMAN_LIKE_MEM_USER_ID=hermes-user
+HUMAN_LIKE_MEM_AGENT_ID=main
+HUMAN_LIKE_MEM_SCENARIO=openclaw-plugin
+HUMAN_LIKE_MEM_LIMIT_NUMBER=6
+HUMAN_LIKE_MEM_MIN_SCORE=0.1
+EOF
+hermes gateway restart
+rg -n "provider: humanlike" ~/.hermes/config.yaml
 ```
 
 Official docs:
@@ -93,14 +99,13 @@ Official docs:
 Quick start:
 
 ```bash
-curl -X POST "https://plugin.human-like.me/api/plugin/v1/search/memory" \
+curl -X POST "http://humanlike-external.coolfriend.cn/api/plugin/v1/search/memory" \
   -H "Content-Type: application/json" \
-  -H "x-api-key: mp_your_key_here" \
+  -H "x-api-key: YOUR_API_KEY" \
   -d '{
-    "query": "what projects am I working on",
-    "user_id": "demo-user",
-    "agent_id": "main",
-    "memory_limit_number": 6,
+    "query": "What does the user prefer?",
+    "user_id": "user_001",
+    "memory_limit_number": 5,
     "min_score": 0.1
   }'
 ```

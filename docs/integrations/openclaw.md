@@ -12,6 +12,30 @@ Official documentation:
 - publish metadata: [compat/openclaw/_meta.json](../../compat/openclaw/_meta.json)
 - compatibility notes: [compat/openclaw/README.md](../../compat/openclaw/README.md)
 
+## Quick Start
+
+```bash
+openclaw plugin install human-like-mem
+openclaw config set plugins.entries.human-like-mem.config.apiKey "mp_your_key_here"
+openclaw config set plugins.slots.memory human-like-mem
+openclaw plugin status human-like-mem
+```
+
+## How It Works
+
+- before response: the plugin retrieves relevant memories and injects them into context
+- after response: the plugin caches the conversation and flushes memory by turn threshold or timeout
+- agent tools: the agent can call `memory_search` and `memory_store`
+
+## Optional Configuration
+
+Defaults called out in the official docs:
+
+- `timeoutMs=15000`
+- `turnThreshold=5`
+- `autoFlushTimeout=300000`
+- `memoryLimitNumber=6`
+
 ## What This Path Is For
 
 Choose OpenClaw integration when:
@@ -20,21 +44,9 @@ Choose OpenClaw integration when:
 - you want to preserve the older OpenClaw packaging shape
 - you need an OpenClaw-facing entry point instead of the Hermes skill manifest
 
-## Runtime Surface
+## Compatibility Notes
 
-The runtime command surface remains aligned with the Hermes implementation:
-
-- `recall`
-- `search`
-- `save`
-- `save-batch`
-- `config`
-
-The actual runtime implementation lives in [scripts/memory.mjs](../../scripts/memory.mjs).
-
-## Configuration Model
-
-The runtime expects environment variables for API access and identity:
+The repo also keeps an environment-variable-driven debug/runtime entry point:
 
 ```bash
 export HUMAN_LIKE_MEM_API_KEY="mp_your_key_here"
@@ -42,6 +54,8 @@ export HUMAN_LIKE_MEM_BASE_URL="https://plugin.human-like.me"
 export HUMAN_LIKE_MEM_USER_ID="openclaw-user"
 export HUMAN_LIKE_MEM_AGENT_ID="main"
 ```
+
+The actual source implementation lives in [scripts/memory.mjs](../../scripts/memory.mjs), but for OpenClaw product setup the plugin flow above is the correct entry point.
 
 ## Recommended Usage
 
