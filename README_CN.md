@@ -1,56 +1,72 @@
-# Human-Like Memory Skill for Hermes Agent
+# Human-Like Memory 集成仓库
 
 [English](./README.md) | 中文
 
-Human-Like Memory 是一个给 Hermes Agent 使用的长期记忆 Skill，用于显式地 `recall`、`search` 和 `save`。
+这个仓库现在提供 Human-Like Memory 的三种接入方式：
 
-它的设计重点是“按需触发”，而不是常驻后台自动记忆：
+- OpenClaw
+- Hermes Agent
+- 直接 API 接入
 
-- 只有在代理或用户真正需要时，才执行 `recall` / `search`
-- 只有在需要保存事实、决策或摘要时，才执行 `save` / `save-batch`
-- 只有调用这些命令时才会发起网络请求
-- 只读取声明过的环境变量，不扫描本地文件
+你可以把它当成 Human-Like Memory 的统一集成入口，根据自己的运行环境选择对应方式。
 
-## 它能做什么
+## 三种接入方式
 
-- 召回过去的偏好、项目上下文和关键决策
-- 当用户提到历史工作或历史对话时检索相关记忆
-- 当用户说“记住这个”或确认重要信息时写入长期记忆
-- 保持简单稳定的命令面：`recall`、`search`、`save`、`save-batch`、`config`
+### 1. OpenClaw
 
-## 工作原理
+如果你希望把 Human-Like Memory 接入 OpenClaw 工作流，走这一条。
 
-这个 Skill 本质上是一个面向 Hermes 的 Human-Like Memory API 封装层。
+- 接入文档：[docs/integrations/openclaw.md](./docs/integrations/openclaw.md)
+- 官方文档：<https://plugin.human-like.me/docs?tab=plugin>
+- OpenClaw 兼容元数据：[compat/openclaw/](./compat/openclaw/)
 
-调用时：
+### 2. Hermes Agent
 
-- `recall` 和 `search` 会请求 `/api/plugin/v1/search/memory`
-- `save` 和 `save-batch` 会请求 `/api/plugin/v1/add/message`
-- API 只接收你传入的 query 或 messages，以及 `user_id`、`agent_id` 和少量调优参数
-- 脚本返回结构化 JSON，Hermes 可以直接用于代理上下文
+如果你希望通过 `recall`、`search`、`save`、`save-batch` 这些显式命令把长期记忆接入 Hermes Agent，走这一条。
 
-默认服务地址：
+- 接入文档：[docs/integrations/hermes-agent.md](./docs/integrations/hermes-agent.md)
+- 官方文档：<https://plugin.human-like.me/docs?tab=hermes>
+- Hermes Skill 清单：[SKILL.md](./SKILL.md)
+- 运行时脚本：[scripts/memory.mjs](./scripts/memory.mjs)
 
-```text
-https://plugin.human-like.me
-```
+### 3. 直接 API 接入
 
-如果你有自己的服务，可以通过 `HUMAN_LIKE_MEM_BASE_URL` 指向自部署地址。
+如果你希望从自己的应用、Agent Runtime 或后端服务里直接调用 Human-Like Memory，走这一条。
+
+- 接入文档：[docs/integrations/api.md](./docs/integrations/api.md)
+- 官方文档：<https://plugin.human-like.me/docs?tab=api>
+
+## Human-Like Memory 能做什么
+
+Human-Like Memory 为你的 Agent 栈提供显式的长期记忆操作：
+
+- 检索相关的历史上下文
+- 搜索过去的决策、偏好和事实
+- 在信息值得保留时写入长期记忆
+- 保持可控的记忆使用方式，而不是默认开启静默后台记忆
 
 ## 仓库结构
 
-- `SKILL.md`: Hermes 的权威 Skill 清单
-- `scripts/memory.mjs`: Node.js CLI 实现
-- `examples/messages.json`: `save-batch` 的示例输入
-- `compat/openclaw/`: 为兼容保留的 OpenClaw 元数据
+- `README.md`: 英文总入口
+- `README_CN.md`: 中文总入口
+- `docs/integrations/openclaw.md`: OpenClaw 接入说明
+- `docs/integrations/hermes-agent.md`: Hermes Agent 接入说明
+- `docs/integrations/api.md`: API 接入说明
+- `SKILL.md`: Hermes Skill 清单
+- `scripts/memory.mjs`: Hermes Skill 运行时
+- `compat/openclaw/`: OpenClaw 兼容元数据
 
-## 环境要求
+## 快速开始
 
-- Node.js 18+
-- Hermes Agent CLI
-- Human-Like Memory API key
+### OpenClaw
 
-## 安装
+从这里开始：
+
+```text
+https://plugin.human-like.me/docs?tab=plugin
+```
+
+### Hermes Agent
 
 从 GitHub 安装：
 
@@ -58,15 +74,7 @@ https://plugin.human-like.me
 hermes skills install github:qwang6-1936520/Human-like-memory-skill
 ```
 
-本地开发安装：
-
-```bash
-hermes skills install .
-```
-
-## 配置
-
-先在 <https://plugin.human-like.me> 获取 `mp_xxx` API key，然后设置：
+然后配置：
 
 ```bash
 export HUMAN_LIKE_MEM_API_KEY="mp_your_key_here"
@@ -75,91 +83,42 @@ export HUMAN_LIKE_MEM_USER_ID="hermes-user"
 export HUMAN_LIKE_MEM_AGENT_ID="main"
 ```
 
-可选调优参数：
+### API
 
-```bash
-export HUMAN_LIKE_MEM_LIMIT_NUMBER="6"
-export HUMAN_LIKE_MEM_MIN_SCORE="0.1"
-export HUMAN_LIKE_MEM_TIMEOUT_MS="30000"
-export HUMAN_LIKE_MEM_RECALL_ENABLED="true"
-export HUMAN_LIKE_MEM_ADD_ENABLED="true"
-export HUMAN_LIKE_MEM_AUTO_SAVE_ENABLED="true"
-export HUMAN_LIKE_MEM_SAVE_TRIGGER_TURNS="5"
-export HUMAN_LIKE_MEM_SAVE_MAX_MESSAGES="20"
+基础服务地址：
+
+```text
+https://plugin.human-like.me
 ```
 
-验证当前运行配置：
+本仓库当前实际使用的核心接口：
 
-```bash
-node ./scripts/memory.mjs config
-```
+- `POST /api/plugin/v1/search/memory`
+- `POST /api/plugin/v1/add/message`
 
-## 用法
+## 该选哪种接入方式？
 
-召回记忆：
-
-```bash
-node ./scripts/memory.mjs recall "我最近在推进什么项目"
-```
-
-搜索记忆：
-
-```bash
-node ./scripts/memory.mjs search "我的命名偏好"
-```
-
-保存单轮对话：
-
-```bash
-node ./scripts/memory.mjs save "我更喜欢 UTC+8 时间戳" "收到，我会记住。"
-```
-
-批量保存消息：
-
-```bash
-node ./scripts/memory.mjs save-batch < ./examples/messages.json
-```
-
-## 适用场景
-
-适合：
-
-- 用户提到过去的工作、偏好或决策
-- 代理需要跨会话连续性
-- 用户明确要求“记住这件事”
-
-不适合：
-
-- 每轮自动召回
-- 静默后台保存
-- 完全本地、零网络传输的记忆系统
-
-## 自部署与接入
-
-如果你运行自己的 Human-Like Memory 服务，可以这样接入：
-
-```bash
-export HUMAN_LIKE_MEM_BASE_URL="https://your-memory-service.example.com"
-```
-
-接入建议：
-
-- `HUMAN_LIKE_MEM_USER_ID` 对同一用户保持稳定
-- `HUMAN_LIKE_MEM_AGENT_ID` 对同一代理人格或工作区保持稳定
-- 根据业务场景调整 `HUMAN_LIKE_MEM_LIMIT_NUMBER`、`HUMAN_LIKE_MEM_MIN_SCORE` 和 `HUMAN_LIKE_MEM_TIMEOUT_MS`
-- 如需关闭召回或写入，可显式设置 `HUMAN_LIKE_MEM_RECALL_ENABLED=false` 或 `HUMAN_LIKE_MEM_ADD_ENABLED=false`
+- 如果你的运行环境已经基于 OpenClaw，选 OpenClaw
+- 如果你想要一个可安装的 Hermes Skill，并通过显式命令控制记忆，选 Hermes Agent
+- 如果你想把记忆能力嵌入自己的产品、后端或 Agent 框架，选 API
 
 ## 安全与隐私
 
-- 只有调用记忆命令时才会发送数据
-- 不会读取任意本地文件、shell 历史或无关环境变量
-- 不要把密钥、密码、私钥等敏感信息发给记忆服务
+- 只有在集成层真正触发读写记忆时才会发起网络请求
+- 本仓库里的 Hermes 运行时只读取声明过的环境变量
+- 不要把密码、令牌、私钥等敏感信息发送到记忆服务
 
-详细的数据传输与安全边界见 [SECURITY.md](./SECURITY.md)。
+本仓库实现层面的数据流和边界见 [SECURITY.md](./SECURITY.md)。
 
-## OpenClaw 兼容说明
+## 关于文档准确性
 
-仓库保留了 `compat/openclaw/` 下的历史元数据，但文档与主入口现在以 Hermes Skill 为主。
+本仓库会保证接入结构、运行时脚本和当前代码实现保持一致。
+
+如果你需要查看产品界面步骤、控制台配置流程或最新平台说明，请以官方文档为准：
+
+- OpenClaw：<https://plugin.human-like.me/docs?tab=plugin>
+- Hermes Agent：<https://plugin.human-like.me/docs?tab=hermes>
+- API：<https://plugin.human-like.me/docs?tab=api>
 
 ## License
 
